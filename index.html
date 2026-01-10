@@ -53,6 +53,57 @@
       animation: slideDown 0.3s ease-out forwards;
     }
   </style>
+
+  <style>
+  /* ===============================
+     NAVY THEME OVERRIDE
+     =============================== */
+
+  /* Background utama */
+  body {
+    background: linear-gradient(to bottom right, #eff6ff, #bfdbfe) !important;
+  }
+
+  /* Primary button */
+  .bg-red-600 { background-color: #0f172a !important; }
+  .hover\:bg-red-700:hover { background-color: #020617 !important; }
+
+  /* Gradient utama */
+  .from-red-500 {
+    --tw-gradient-from: #0f172a !important;
+  }
+  .to-red-600 {
+    --tw-gradient-to: #1e3a8a !important;
+  }
+
+  /* Soft red background */
+  .bg-red-50 { background-color: #eff6ff !important; }
+  .bg-red-100 { background-color: #dbeafe !important; }
+
+  /* Text merah → navy */
+  .text-red-600 { color: #1e3a8a !important; }
+  .text-red-900 { color: #020617 !important; }
+  .text-red-100 { color: #bfdbfe !important; }
+
+  /* Border & focus */
+  .focus\:border-red-500:focus {
+    border-color: #1e3a8a !important;
+  }
+
+  /* Hover soft red */
+  .hover\:bg-red-50:hover {
+    background-color: #eff6ff !important;
+  }
+
+  /* Icon & accent */
+  .text-red-400 { color: #60a5fa !important; }
+
+  /* Warning box admin */
+  .border-red-500 {
+    border-color: #1e3a8a !important;
+  }
+</style>
+
   <style>@view-transition { navigation: auto; }</style>
  </head>
  <body class="bg-gradient-to-br from-red-50 to-red-200 min-h-screen">
