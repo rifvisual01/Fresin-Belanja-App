@@ -56,53 +56,70 @@
 
   <style>
   /* ===============================
-     NAVY THEME OVERRIDE
+     NAVY THEME - LIGHT VERSION
      =============================== */
 
   /* Background utama */
   body {
-    background: linear-gradient(to bottom right, #eff6ff, #bfdbfe) !important;
+    background: linear-gradient(to bottom right, #eff6ff, #dbeafe) !important;
   }
 
   /* Primary button */
-  .bg-red-600 { background-color: #0f172a !important; }
-  .hover\:bg-red-700:hover { background-color: #020617 !important; }
+  .bg-red-600 {
+    background-color: #1e40af !important; /* blue-800 */
+  }
+  .hover\:bg-red-700:hover {
+    background-color: #1d4ed8 !important; /* blue-700 */
+  }
 
   /* Gradient utama */
   .from-red-500 {
-    --tw-gradient-from: #0f172a !important;
+    --tw-gradient-from: #2563eb !important; /* blue-600 */
   }
   .to-red-600 {
-    --tw-gradient-to: #1e3a8a !important;
+    --tw-gradient-to: #1e40af !important; /* blue-800 */
   }
 
-  /* Soft red background */
-  .bg-red-50 { background-color: #eff6ff !important; }
-  .bg-red-100 { background-color: #dbeafe !important; }
+  /* Soft background */
+  .bg-red-50 {
+    background-color: #eff6ff !important;
+  }
+  .bg-red-100 {
+    background-color: #dbeafe !important;
+  }
 
-  /* Text merah → navy */
-  .text-red-600 { color: #1e3a8a !important; }
-  .text-red-900 { color: #020617 !important; }
-  .text-red-100 { color: #bfdbfe !important; }
+  /* Text merah → navy terang */
+  .text-red-600 {
+    color: #1e40af !important;
+  }
+  .text-red-900 {
+    color: #1e3a8a !important;
+  }
+  .text-red-100 {
+    color: #dbeafe !important;
+  }
 
-  /* Border & focus */
+  /* Border & focus input */
   .focus\:border-red-500:focus {
-    border-color: #1e3a8a !important;
+    border-color: #2563eb !important;
   }
 
-  /* Hover soft red */
+  /* Hover card */
   .hover\:bg-red-50:hover {
     background-color: #eff6ff !important;
   }
 
-  /* Icon & accent */
-  .text-red-400 { color: #60a5fa !important; }
+  /* Icon accent */
+  .text-red-400 {
+    color: #60a5fa !important; /* blue-400 */
+  }
 
-  /* Warning box admin */
+  /* Border accent */
   .border-red-500 {
-    border-color: #1e3a8a !important;
+    border-color: #2563eb !important;
   }
 </style>
+
 
   <style>@view-transition { navigation: auto; }</style>
  </head>
