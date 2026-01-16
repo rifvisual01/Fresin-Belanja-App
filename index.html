@@ -1495,6 +1495,20 @@ function handleAdminSearch(raw) {
   adminSuggestBox.classList.remove('hidden');
 }
 
+function selectAdminSuggestion(value) {
+  // isi input
+  adminInput.value = value;
+
+  // simpan keyword
+  currentSearchKeyword = value.toLowerCase().trim();
+
+  // tutup suggestion
+  adminSuggestBox.classList.add('hidden');
+  clearBtn.classList.remove('hidden');
+
+  // 🔥 LANGSUNG FILTER LAPORAN
+  filterTransactions(currentSearchKeyword);
+}
 
 
 // ⭐ FUNCTION UNTUK FILTER BERDASARKAN SEARCH
