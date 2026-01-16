@@ -1307,13 +1307,16 @@ function highlight(text, keyword) {
 }
 
    function itemMatchesKeyword(item, keyword) {
-  if (!keyword) return true;            // keyword kosong → semua cocok
-  if (!item || !item[0]) return false;
+  if (!keyword) return true;
+  if (!Array.isArray(item)) return false;
 
-  return item[0]
-    .toLowerCase()
-    .includes(keyword);
+  return item.some(value =>
+    typeof value === 'string' &&
+    value.toLowerCase().includes(keyword)
+  );
 }
+
+
 
 
     /**
