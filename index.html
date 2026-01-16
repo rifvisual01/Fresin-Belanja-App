@@ -1392,16 +1392,38 @@ function buildAdminSuggestions(transactions) {
       tempatSet.add(t.tempat_belanja.trim());
     }
 
-    if (t.items) {
-      try {
-        const items = JSON.parse(t.items);
-        items.forEach(i => {
-          if (i && typeof i[0] === 'string' && i[0].trim()) {
-            barangSet.add(i[0].trim());
+    // bahan baku
+if (t.items) {
+  try {
+    const items = JSON.parse(t.items);
+    items.forEach(i => {
+      if (Array.isArray(i)) {
+        i.forEach(val => {
+          if (typeof val === 'string' && val.trim()) {
+            barangSet.add(val.trim());
           }
         });
-      } catch (e) {}
-    }
+      }
+    });
+  } catch (e) {}
+}
+
+// operasional ✅ TAMBAHAN
+if (t.operasional) {
+  try {
+    const ops = JSON.parse(t.operasional);
+    ops.forEach(i => {
+      if (Array.isArray(i)) {
+        i.forEach(val => {
+          if (typeof val === 'string' && val.trim()) {
+            barangSet.add(val.trim());
+          }
+        });
+      }
+    });
+  } catch (e) {}
+}
+
   });
 
   return {
