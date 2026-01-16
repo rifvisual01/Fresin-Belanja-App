@@ -499,6 +499,9 @@ let currentPhoto = null;
     let allPeriodTransactions = [];
     let currentSearchKeyword = '';
     let adminSuggestions = { tempat: [], barang: [] };
+   let currentSearchType = 'all'; 
+// 'all' | 'barang' | 'tempat'
+
 
 
 const adminInput = document.getElementById('adminSearchInput');
@@ -511,10 +514,14 @@ adminInput.addEventListener('input', function () {
   clearTimeout(searchTimer);
   const value = this.value;
 
+  // 🔥 LANGKAH 3: reset tipe search saat ketik manual
+  currentSearchType = 'all';
+
   searchTimer = setTimeout(() => {
     handleAdminSearch(value);
   }, 150);
 });
+
 
 
 clearBtn.addEventListener('click', function () {
@@ -1502,13 +1509,17 @@ function selectAdminSuggestion(value) {
   // simpan keyword
   currentSearchKeyword = value.toLowerCase().trim();
 
+  // 🔥 TANDAI BAHWA INI SEARCH TEMPAT
+  currentSearchType = 'tempat';
+
   // tutup suggestion
   adminSuggestBox.classList.add('hidden');
   clearBtn.classList.remove('hidden');
 
-  // 🔥 LANGSUNG FILTER LAPORAN
+  // filter laporan
   filterTransactions(currentSearchKeyword);
 }
+
 
 
 // ⭐ FUNCTION UNTUK FILTER BERDASARKAN SEARCH
@@ -1768,11 +1779,13 @@ const filteredOperasional = operasional.filter(item =>
 
 if (
   currentSearchKeyword &&
+  currentSearchType !== 'tempat' && // 🔥 TAMBAHAN
   filteredBahan.length === 0 &&
   filteredOperasional.length === 0
 ) {
   return;
 }
+
 
 
 
