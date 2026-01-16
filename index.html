@@ -1310,11 +1310,15 @@ function highlight(text, keyword) {
   if (!keyword) return true;
   if (!Array.isArray(item)) return false;
 
-  return item.some(value =>
-    typeof value === 'string' &&
-    value.toLowerCase().includes(keyword)
-  );
+  // gabungkan SEMUA string di item
+  const text = item
+    .filter(v => typeof v === 'string')
+    .join(' ')
+    .toLowerCase();
+
+  return text.includes(keyword);
 }
+
 
 
 
