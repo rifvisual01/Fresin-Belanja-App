@@ -499,8 +499,6 @@ let currentPhoto = null;
     let allPeriodTransactions = [];
     let currentSearchKeyword = '';
     let adminSuggestions = { tempat: [], barang: [] };
-   let currentSearchType = 'all'; 
-// 'all' | 'barang' | 'tempat'
 
 
 
@@ -1317,17 +1315,10 @@ function highlight(text, keyword) {
   if (!keyword) return true;
   if (!Array.isArray(item)) return false;
 
-  // gabungkan SEMUA string di item
-  const text = item
-    .filter(v => typeof v === 'string')
-    .join(' ')
-    .toLowerCase();
-
-  return text.includes(keyword);
+  // hanya cek NAMA BARANG (index 0)
+  const name = String(item[0] || '').toLowerCase();
+  return name.includes(keyword);
 }
-
-
-
 
 
     /**
@@ -1404,16 +1395,25 @@ if (t.items) {
   try {
     const items = JSON.parse(t.items);
     items.forEach(i => {
-      if (Array.isArray(i)) {
-        i.forEach(val => {
-          if (typeof val === 'string' && val.trim()) {
-            barangSet.add(val.trim());
-          }
-        });
+      if (Array.isArray(i) && typeof i[0] === 'string') {
+        barangSet.add(i[0].trim());
       }
     });
-  } catch (e) {}
+  } catch {}
 }
+
+// operasional
+if (t.operasional) {
+  try {
+    const ops = JSON.parse(t.operasional);
+    ops.forEach(i => {
+      if (Array.isArray(i) && typeof i[0] === 'string') {
+        barangSet.add(i[0].trim());
+      }
+    });
+  } catch {}
+}
+
 
 // operasional ✅ TAMBAHAN
 if (t.operasional) {
