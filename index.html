@@ -1354,13 +1354,16 @@ fetch(API_BASE, {
   allPeriodTransactions = data;
   adminSuggestions = buildAdminSuggestions(data);
 
-  currentSearchKeyword = '';
-  adminInput.value = '';
-  adminSuggestBox.classList.add('hidden');
-  clearBtn.classList.add('hidden');
+  // ❌ JANGAN reset keyword & input
+  // currentSearchKeyword = '';
+  // adminInput.value = '';
 
-  renderReport(data);
+  adminSuggestBox.classList.add('hidden');
+
+  // ✅ PAKAI FILTER SEARCH YANG SUDAH ADA
+  filterTransactions(currentSearchKeyword);
 })
+
  .catch(error => {
     showToast('Error loading report: ' + error, 'error');
   })
@@ -1512,11 +1515,17 @@ function filterTransactions(keyword) {
   renderReport(filtered);
 
   if (filtered.length === 0) {
-    showToast('Tidak ada hasil untuk "' + keyword + '"', 'warning');
-  } else {
-    showToast('Ditemukan ' + filtered.length + ' transaksi', 'success');
-  }
+  showToast(
+    'Tidak ada hasil untuk "' + currentSearchKeyword + '"',
+    'warning'
+  );
+} else {
+  showToast(
+    'Ditemukan ' + filtered.length + ' transaksi',
+    'success'
+  );
 }
+
 
 
   
