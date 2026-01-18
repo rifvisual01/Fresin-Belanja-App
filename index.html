@@ -1367,12 +1367,15 @@ if (adminSuggestBox) adminSuggestBox.classList.add('hidden');
 function buildAdminSuggestions(transactions) {
   const tempatSet = new Set();
   const barangSet = new Set();
+  const operasionalSet = new Set();
 
   transactions.forEach(t => {
+    // TEMPAT BELANJA
     if (typeof t.tempat_belanja === 'string' && t.tempat_belanja.trim()) {
       tempatSet.add(t.tempat_belanja.trim());
     }
 
+    // BAHAN BAKU
     if (t.items) {
       try {
         const items = JSON.parse(t.items);
@@ -1383,13 +1386,27 @@ function buildAdminSuggestions(transactions) {
         });
       } catch (e) {}
     }
+
+    // 🔥 OPERASIONAL (BARU)
+    if (t.operasional) {
+      try {
+        const ops = JSON.parse(t.operasional);
+        ops.forEach(o => {
+          if (o && typeof o[0] === 'string' && o[0].trim()) {
+            operasionalSet.add(o[0].trim());
+          }
+        });
+      } catch (e) {}
+    }
   });
 
   return {
     tempat: Array.from(tempatSet),
-    barang: Array.from(barangSet)
+    barang: Array.from(barangSet),
+    operasional: Array.from(operasionalSet)
   };
 }
+
 function setLoadReportLoading(isLoading) {
   const btn = document.getElementById('btnLoadReport');
   if (!btn) return;
@@ -1429,14 +1446,21 @@ function handleAdminSearch(raw) {
   clearBtn.classList.remove('hidden');
 
   const tempatMatch = adminSuggestions.tempat.filter(v =>
-    v.toLowerCase().includes(keyword)
-  );
+  v.toLowerCase().includes(keyword)
+);
 
-  const barangMatch = adminSuggestions.barang.filter(v =>
-    v.toLowerCase().includes(keyword)
-  );
+const barangMatch = adminSuggestions.barang.filter(v =>
+  v.toLowerCase().includes(keyword)
+);
 
-  const results = [...new Set([...tempatMatch, ...barangMatch])].slice(0, 8);
+const operasionalMatch = (adminSuggestions.operasional || []).filter(v =>
+  v.toLowerCase().includes(keyword)
+);
+
+const results = [
+  ...new Set([...tempatMatch, ...barangMatch, ...operasionalMatch])
+].slice(0, 8);
+
 
   if (!results.length) {
     adminSuggestBox.classList.add('hidden');
@@ -1484,22 +1508,22 @@ function filterTransactions(keyword) {
       } catch (e) {}
     }
 
-    return tempatMatch || itemMatch;
+    let operasionalMatch = false;
+    if (transaction.operasional) {
+      try {
+        const ops = JSON.parse(transaction.operasional);
+        operasionalMatch = ops.some(o =>
+          typeof o[0] === 'string' &&
+          o[0].toLowerCase().includes(currentSearchKeyword)
+        );
+      } catch (e) {}
+    }
+
+    return tempatMatch || itemMatch || operasionalMatch;
   });
 
   renderReport(filtered);
-
-  // Tampilkan notifikasi hasil pencarian
-  if (filtered.length === 0) {
-    showToast('Tidak ada hasil untuk "' + keyword + '"', 'warning');
-  } else {
-    showToast('Ditemukan ' + filtered.length + ' transaksi', 'success');
-  }
 }
-
-  
-  
-
     function renderReport(periodTransactions) {
       let totalAmount = 0;
 
@@ -2252,7 +2276,16 @@ function preloadSuggestions() {
 function selectAdminSuggestion(value) {
   adminInput.value = value;
   adminSuggestBox.classList.add('hidden');
+  clearBtn.classList.remove('hidden');
+
   filterTransactions(value);
+
+  const count = document.querySelectorAll('#transactionsList > div').length;
+  if (count === 0) {
+    showToast(`Tidak ada transaksi untuk "${value}"`, 'warning');
+  } else {
+    showToast(`Ditemukan ${count} transaksi`, 'success');
+  }
 }
 document.addEventListener('click', function (e) {
   if (!adminInput.contains(e.target) && !adminSuggestBox.contains(e.target)) {
