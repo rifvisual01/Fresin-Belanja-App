@@ -449,6 +449,44 @@
        </div>
       </div>
      </div>
+
+      <div id="reportViewContainer" class="space-y-6">
+     <div id="bahanInfo" class="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl p-5 text-white shadow-lg">
+      <div class="flex items-center justify-between">
+       <div>
+        <div class="flex items-center gap-2 mb-2">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+         </svg><span class="text-sm opacity-90">Pengeluaran Bahan Baku</span>
+        </div>
+        <p id="bahanTotalAmount" class="text-3xl font-bold">Rp 0</p>
+       </div>
+       <div class="text-right">
+        <div class="bg-white bg-opacity-20 rounded-xl px-4 py-2">
+         <p class="text-xs opacity-90 mb-1">Transaksi</p>
+         <p id="bahanTotalTransactions" class="text-2xl font-bold">0</p>
+        </div>
+       </div>
+      </div>
+     </div>
+
+        <div id="reportViewContainer" class="space-y-6">
+     <div id="operasionalInfo" class="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl p-5 text-white shadow-lg">
+      <div class="flex items-center justify-between">
+       <div>
+        <div class="flex items-center gap-2 mb-2">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+         </svg><span class="text-sm opacity-90">Pengeluaran Operasional</span>
+        </div>
+        <p id="operasionalTotalAmount" class="text-3xl font-bold">Rp 0</p>
+       </div>
+       <div class="text-right">
+        <div class="bg-white bg-opacity-20 rounded-xl px-4 py-2">
+         <p class="text-xs opacity-90 mb-1">Transaksi</p>
+         <p id="operasionalTotalAmount" class="text-3xl font-bold">Rp 0</p>
+        </div>
+       </div>
+      </div>
+     </div>
      <div id="chartContainer" class="hidden bg-white rounded-2xl shadow-lg p-5">
       <div class="flex items-center gap-2 mb-4">
        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -1532,6 +1570,11 @@ function filterTransactions(keyword) {
 }
     function renderReport(periodTransactions) {
       let totalAmount = 0;
+let totalBahan = 0;
+let totalOperasional = 0;
+
+let countBahan = 0;
+let countOperasional = 0;
 
      function isPlaceMatch(transaction) {
   if (!currentSearchKeyword) return false;
@@ -1552,6 +1595,16 @@ function itemMatch(name) {
       periodTransactions.forEach(function(t) {
         const bahan = t.items ? JSON.parse(t.items) : [];
 const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+
+       bahan.forEach(item => {
+  totalBahan += item[3];
+  countBahan++;
+});
+
+       operasional.forEach(item => {
+  totalOperasional += item[3];
+  countOperasional++;
+});
 
 if (isPlaceMatch(t)) {
   // 🔵 MODE TEMPAT → hitung SEMUA
@@ -1587,6 +1640,21 @@ if (isPlaceMatch(t)) {
       document.getElementById('periodLabel').textContent = periodLabel;
       document.getElementById('periodTotalAmount').textContent = 'Rp ' + totalAmount.toLocaleString('id-ID');
       document.getElementById('periodTotalTransactions').textContent = periodTransactions.length;
+
+     // === TAMPILKAN BAHAN BAKU ===
+document.getElementById('bahanTotalAmount').textContent =
+  'Rp ' + totalBahan.toLocaleString('id-ID');
+
+document.getElementById('bahanTotalTransactions').textContent =
+  countBahan;
+
+// === TAMPILKAN OPERASIONAL ===
+document.getElementById('operasionalTotalAmount').textContent =
+  'Rp ' + totalOperasional.toLocaleString('id-ID');
+
+document.getElementById('operasionalTotalTransactions').textContent =
+  countOperasional;
+
       if (currentSearchKeyword) {
   document.getElementById('periodLabel').textContent = periodLabel + ' (Hasil pencarian: "' + currentSearchKeyword + '")';
 }
