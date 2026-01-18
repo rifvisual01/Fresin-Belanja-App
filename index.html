@@ -1571,52 +1571,6 @@ function filterTransactions(keyword) {
   });
 });
 
-
-bahan.forEach(item => totalAmount += item[3]);
-operasional.forEach(item => totalAmount += item[3]);
-
-        });
-
-      const startObj = new Date(startDate);
-      const endObj = new Date(endDate);
-      let periodLabel = '';
-      const isMultiDay = startDate !== endDate;
-      
-      if (startDate === endDate) {
-        periodLabel = startObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      } else {
-        periodLabel = startObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' - ' + endObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      }
-
-      document.getElementById('periodLabel').textContent = periodLabel;
-      document.getElementById('periodTotalAmount').textContent = 'Rp ' + totalAmount.toLocaleString('id-ID');
-      document.getElementById('periodTotalTransactions').textContent = periodTransactions.length;
-      if (currentSearchKeyword) {
-  document.getElementById('periodLabel').textContent = periodLabel + ' (Hasil pencarian: "' + currentSearchKeyword + '")';
-}
-
-      const chartContainer = document.getElementById('chartContainer');
-      if (isMultiDay) {
-        const dailyTotals = {};
-        
-        periodTransactions.forEach(function(t) {
-          const dateKey = new Date(t.created_at).toISOString().split('T')[0];
-          if (!dailyTotals[dateKey]) {
-            dailyTotals[dateKey] = 0;
-          }
-          const bahan = t.items ? JSON.parse(t.items) : [];
-const operasional = t.operasional ? JSON.parse(t.operasional) : [];
-
-bahan.forEach(function(item) {
-  dailyTotals[dateKey] += item[3];
-});
-
-operasional.forEach(function(item) {
-  dailyTotals[dateKey] += item[3];
-});
-
-        });
-
         const dailyData = Object.keys(dailyTotals).sort().map(function(dateKey) {
           const dateObj = new Date(dateKey);
           return {
