@@ -1527,121 +1527,77 @@ function filterTransactions(keyword) {
     return tempatMatch || itemMatch || operasionalMatch;
   });
 
-  renderReport(allPeriodTransactions, '');
+  renderReport(filtered);
 }
-    function renderReport(periodTransactions, keyword = '') {
-  const isSearch = !!keyword;
-  let totalAmount = 0;
+    function renderReport(periodTransactions) {
+      let totalAmount = 0;
 
-  // =============================
-  // HITUNG TOTAL (SUDAH BENAR)
-  // =============================
-  periodTransactions.forEach(function (t) {
-    const bahan = t.items ? JSON.parse(t.items) : [];
-    const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+      periodTransactions.forEach(function(t) {
+        const bahan = t.items ? JSON.parse(t.items) : [];
+const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-    bahan.forEach(item => {
-      if (!isSearch || item[0].toLowerCase().includes(keyword)) {
-        totalAmount += item[3];
+bahan.forEach(item => totalAmount += item[3]);
+operasional.forEach(item => totalAmount += item[3]);
+
+        });
+
+      const startObj = new Date(startDate);
+      const endObj = new Date(endDate);
+      let periodLabel = '';
+      const isMultiDay = startDate !== endDate;
+      
+      if (startDate === endDate) {
+        periodLabel = startObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      } else {
+        periodLabel = startObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' - ' + endObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
       }
-    });
 
-    operasional.forEach(item => {
-      if (!isSearch || item[0].toLowerCase().includes(keyword)) {
-        totalAmount += item[3];
-      }
-    });
-  });
-
-  // =============================
-  // HEADER PERIODE
-  // =============================
-  const startObj = new Date(startDate);
-  const endObj = new Date(endDate);
-  let periodLabel = '';
-
-  if (startDate === endDate) {
-    periodLabel = startObj.toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  } else {
-    periodLabel =
-      startObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) +
-      ' - ' +
-      endObj.toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-  }
-
-  document.getElementById('periodLabel').textContent = isSearch
-    ? periodLabel + ` (Hasil pencarian: "${currentSearchKeyword}")`
-    : periodLabel;
-
-  document.getElementById('periodTotalAmount').textContent =
-    'Rp ' + totalAmount.toLocaleString('id-ID');
-
-  // 🔧 FIX: JUMLAH TRANSAKSI BUKAN JUMLAH HARI
-  document.getElementById('periodTotalTransactions').textContent =
-    periodTransactions.length;
-
-  // =============================
-  // CHART (🔧 FIX: IKUT FILTER SEARCH)
-  // =============================
-  const chartContainer = document.getElementById('chartContainer');
-
-  if (startDate !== endDate) {
-    const dailyTotals = {};
-
-    periodTransactions.forEach(function (t) {
-      const dateKey = new Date(t.created_at).toISOString().split('T')[0];
-      if (!dailyTotals[dateKey]) dailyTotals[dateKey] = 0;
-
-      const bahan = t.items ? JSON.parse(t.items) : [];
-      const operasional = t.operasional ? JSON.parse(t.operasional) : [];
-
-      bahan.forEach(item => {
-        if (!isSearch || item[0].toLowerCase().includes(keyword)) {
-          dailyTotals[dateKey] += item[3];
-        }
-      });
-
-      operasional.forEach(item => {
-        if (!isSearch || item[0].toLowerCase().includes(keyword)) {
-          dailyTotals[dateKey] += item[3];
-        }
-      });
-    });
-
-    const dailyData = Object.keys(dailyTotals)
-      .sort()
-      .map(dateKey => {
-        const dateObj = new Date(dateKey);
-        return {
-          date: dateKey,
-          label: dateObj.toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short'
-          }),
-          total: dailyTotals[dateKey]
-        };
-      });
-
-    chartContainer.classList.remove('hidden');
-    drawChart(dailyData);
-  } else {
-    chartContainer.classList.add('hidden');
-  }
-
-  // =============================
-  // 🔥 DETAIL TRANSAKSI (LANGKAH 4)
-  // =============================
-  renderTransactions(periodTransactions, keyword);
+      document.getElementById('periodLabel').textContent = periodLabel;
+      document.getElementById('periodTotalAmount').textContent = 'Rp ' + totalAmount.toLocaleString('id-ID');
+      document.getElementById('periodTotalTransactions').textContent = periodTransactions.length;
+      if (currentSearchKeyword) {
+  document.getElementById('periodLabel').textContent = periodLabel + ' (Hasil pencarian: "' + currentSearchKeyword + '")';
 }
 
+      const chartContainer = document.getElementById('chartContainer');
+      if (isMultiDay) {
+        const dailyTotals = {};
+        
+        periodTransactions.forEach(function(t) {
+          const dateKey = new Date(t.created_at).toISOString().split('T')[0];
+          if (!dailyTotals[dateKey]) {
+            dailyTotals[dateKey] = 0;
+          }
+          const bahan = t.items ? JSON.parse(t.items) : [];
+const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+
+bahan.forEach(function(item) {
+  dailyTotals[dateKey] += item[3];
+});
+
+operasional.forEach(function(item) {
+  dailyTotals[dateKey] += item[3];
+});
+
+        });
+
+        const dailyData = Object.keys(dailyTotals).sort().map(function(dateKey) {
+          const dateObj = new Date(dateKey);
+          return {
+            date: dateKey,
+            label: dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+            total: dailyTotals[dateKey]
+          };
+        });
+
+        chartContainer.classList.remove('hidden');
+        drawChart(dailyData);
+      } else {
+        chartContainer.classList.add('hidden');
+      }
+
+      renderTransactions(periodTransactions);
+    }
 
     function drawChart(dailyData) {
       const canvas = document.getElementById('chartCanvas');
@@ -1702,8 +1658,7 @@ function filterTransactions(keyword) {
     /**
      * ⭐ PERUBAHAN UTAMA: Render daily cards dengan design red card
      */
-    function renderTransactions(transactions, keyword = '') {
-  const isSearch = !!keyword;
+    function renderTransactions(transactions) {
       const container = document.getElementById('transactionsList');
       const emptyState = document.getElementById('emptyState');
 
@@ -1750,28 +1705,18 @@ const operasional = transaction.operasional
           
           let dailyTotal = 0;
 
-dailyTransactions.forEach(function (t) {
+dailyTransactions.forEach(function(t) {
   const bahan = t.items ? JSON.parse(t.items) : [];
   const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-  const filteredBahan = isSearch
-    ? bahan.filter(i =>
-        typeof i[0] === 'string' &&
-        i[0].toLowerCase().includes(keyword)
-      )
-    : bahan;
+  bahan.forEach(function(item) {
+    dailyTotal += item[3];
+  });
 
-  const filteredOperasional = isSearch
-    ? operasional.filter(o =>
-        typeof o[0] === 'string' &&
-        o[0].toLowerCase().includes(keyword)
-      )
-    : operasional;
-
-  // 👉 lanjutkan render / proses di sini jika ada
+  operasional.forEach(function(item) {
+    dailyTotal += item[3];
+  });
 });
-
-
 
 
           // ⭐ HITUNG JUMLAH TEMPAT BELANJA UNIK
