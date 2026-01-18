@@ -1531,6 +1531,16 @@ function filterTransactions(keyword) {
 }
     function renderReport(periodTransactions) {
       let totalAmount = 0;
+
+     function isPlaceMatch(transaction) {
+  if (!currentSearchKeyword) return false;
+  if (!transaction.tempat_belanja) return false;
+
+  return transaction.tempat_belanja
+    .toLowerCase()
+    .includes(currentSearchKeyword);
+}
+
      const isSearching = typeof currentSearchKeyword === 'string' && currentSearchKeyword.length > 0;
 
 function itemMatch(name) {
@@ -1542,17 +1552,24 @@ function itemMatch(name) {
         const bahan = t.items ? JSON.parse(t.items) : [];
 const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-bahan.forEach(item => {
-  if (itemMatch(item[0])) {
-    totalAmount += item[3];
-  }
-});
+if (isPlaceMatch(t)) {
+  // 🔵 MODE TEMPAT → hitung SEMUA
+  bahan.forEach(item => totalAmount += item[3]);
+  operasional.forEach(item => totalAmount += item[3]);
+} else {
+  // 🟢 MODE ITEM → logika lama (TIDAK DIUBAH)
+  bahan.forEach(item => {
+    if (itemMatch(item[0])) {
+      totalAmount += item[3];
+    }
+  });
 
-operasional.forEach(item => {
-  if (itemMatch(item[0])) {
-    totalAmount += item[3];
-  }
-});
+  operasional.forEach(item => {
+    if (itemMatch(item[0])) {
+      totalAmount += item[3];
+    }
+  });
+}
         });
 
       const startObj = new Date(startDate);
@@ -1585,19 +1602,22 @@ operasional.forEach(item => {
           const bahan = t.items ? JSON.parse(t.items) : [];
 const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-bahan.forEach(item => {
-  if (itemMatch(item[0])) {
-    dailyTotals[dateKey] += item[3];
-  }
-});
+if (isPlaceMatch(t)) {
+  bahan.forEach(item => dailyTotals[dateKey] += item[3]);
+  operasional.forEach(item => dailyTotals[dateKey] += item[3]);
+} else {
+  bahan.forEach(item => {
+    if (itemMatch(item[0])) {
+      dailyTotals[dateKey] += item[3];
+    }
+  });
 
-operasional.forEach(item => {
-  if (itemMatch(item[0])) {
-    dailyTotals[dateKey] += item[3];
-  }
-});
-
-
+  operasional.forEach(item => {
+    if (itemMatch(item[0])) {
+      dailyTotals[dateKey] += item[3];
+    }
+  });
+}
         });
 
         const dailyData = Object.keys(dailyTotals).sort().map(function(dateKey) {
