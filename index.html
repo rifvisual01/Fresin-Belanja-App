@@ -743,7 +743,7 @@ window.addEventListener('popstate', function (event) {
       if (result.success) {
         hidePinPopup();
         navigate('admin');
-        showToast('Akses admin berhasil!', 'success');
+   
       } else {
         document.getElementById('pinError').classList.remove('hidden');
         document.getElementById('pinInput').value = '';
@@ -2327,9 +2327,6 @@ function selectAdminSuggestion(value) {
   const count = document.querySelectorAll('#transactionsList > div').length;
   if (count === 0) {
     showToast(`Tidak ada transaksi untuk "${value}"`, 'warning');
-  } else {
-    showToast(`Ditemukan ${count} transaksi`, 'success');
-  }
 }
 document.addEventListener('click', function (e) {
   if (!adminInput.contains(e.target) && !adminSuggestBox.contains(e.target)) {
