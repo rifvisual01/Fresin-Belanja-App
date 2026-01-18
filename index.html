@@ -1435,7 +1435,7 @@ function setLoadReportLoading(isLoading) {
 function handleAdminSearch(raw) {
   const keyword = raw.trim().toLowerCase();
 
-  // KOSONG → tampilkan semua transaksi periode
+  // KOSONG → reset
   if (!keyword) {
     adminSuggestBox.classList.add('hidden');
     clearBtn.classList.add('hidden');
@@ -1445,26 +1445,30 @@ function handleAdminSearch(raw) {
 
   clearBtn.classList.remove('hidden');
 
+  // 🔥 PENTING: FILTER LANGSUNG JALAN (FUZZY SEARCH)
+  filterTransactions(keyword);
+
+  // =========================
+  // SUGGESTION (OPSIONAL)
+  // =========================
   const tempatMatch = adminSuggestions.tempat.filter(v =>
-  v.toLowerCase().includes(keyword)
-);
+    v.toLowerCase().includes(keyword)
+  );
 
-const barangMatch = adminSuggestions.barang.filter(v =>
-  v.toLowerCase().includes(keyword)
-);
+  const barangMatch = adminSuggestions.barang.filter(v =>
+    v.toLowerCase().includes(keyword)
+  );
 
-const operasionalMatch = (adminSuggestions.operasional || []).filter(v =>
-  v.toLowerCase().includes(keyword)
-);
+  const operasionalMatch = (adminSuggestions.operasional || []).filter(v =>
+    v.toLowerCase().includes(keyword)
+  );
 
-const results = [
-  ...new Set([...tempatMatch, ...barangMatch, ...operasionalMatch])
-].slice(0, 8);
-
+  const results = [
+    ...new Set([...tempatMatch, ...barangMatch, ...operasionalMatch])
+  ].slice(0, 8);
 
   if (!results.length) {
     adminSuggestBox.classList.add('hidden');
-    filterTransactions(keyword);
     return;
   }
 
@@ -1477,6 +1481,7 @@ const results = [
 
   adminSuggestBox.classList.remove('hidden');
 }
+
 
 
 
