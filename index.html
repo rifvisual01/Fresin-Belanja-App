@@ -1595,31 +1595,32 @@ return bahanMatch || operasionalMatch;
     function renderReport(periodTransactions) {
       let totalAmount = 0;
 
-periodTransactions.forEach(function(t) {
+periodTransactions.forEach(t => {
   const bahan = t.items ? JSON.parse(t.items) : [];
   const operasional = t.operasional ? JSON.parse(t.operasional) : [];
   const kw = currentSearchKeyword;
 
   bahan.forEach(item => {
-   if (
-  currentSearchType === 'tempat' ||
-  !kw ||
-  (item[0] && item[0].toLowerCase().includes(kw))
-) {
-  transactionTotal += item[3];
-}
+    if (
+      currentSearchType === 'tempat' ||
+      !kw ||
+      (item[0] && item[0].toLowerCase().includes(kw))
+    ) {
+      totalAmount += item[3];
+    }
   });
 
   operasional.forEach(item => {
     if (
-  currentSearchType === 'tempat' ||
-  !kw ||
-  (item[0] && item[0].toLowerCase().includes(kw))
-) {
-  transactionTotal += item[3];
-}
+      currentSearchType === 'tempat' ||
+      !kw ||
+      (item[0] && item[0].toLowerCase().includes(kw))
+    ) {
+      totalAmount += item[3];
+    }
   });
 });
+
 
       const startObj = new Date(startDate);
       const endObj = new Date(endDate);
@@ -1826,18 +1827,19 @@ if (
           
           let dailyTotal = 0;
 
-dailyTransactions.forEach(function(t) {
+dailyTransactions.forEach(t => {
   const bahan = t.items ? JSON.parse(t.items) : [];
   const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-  bahan.forEach(function(item) {
+  bahan.forEach(item => {
     dailyTotal += item[3];
   });
 
-  operasional.forEach(function(item) {
+  operasional.forEach(item => {
     dailyTotal += item[3];
   });
 });
+
 
 
           // ⭐ HITUNG JUMLAH TEMPAT BELANJA UNIK
@@ -1930,23 +1932,24 @@ const kw = currentSearchKeyword;
 
 bahan.forEach(item => {
   if (
-  currentSearchType === 'tempat' ||
-  !kw ||
-  (item[0] && item[0].toLowerCase().includes(kw))
-) {
-  transactionTotal += item[3];
-}
+    currentSearchType === 'tempat' ||
+    !kw ||
+    (item[0] && item[0].toLowerCase().includes(kw))
+  ) {
+    transactionTotal += item[3];
+  }
 });
 
 operasional.forEach(item => {
- if (
-  currentSearchType === 'tempat' ||
-  !kw ||
-  (item[0] && item[0].toLowerCase().includes(kw))
-) {
-  transactionTotal += item[3];
-}
+  if (
+    currentSearchType === 'tempat' ||
+    !kw ||
+    (item[0] && item[0].toLowerCase().includes(kw))
+  ) {
+    transactionTotal += item[3];
+  }
 });
+
 
 
             const transactionCard = document.createElement('div');
@@ -2053,23 +2056,24 @@ const kw = currentSearchKeyword;
 
 bahan.forEach(item => {
   if (
-  currentSearchType === 'tempat' ||
-  !kw ||
-  (item[0] && item[0].toLowerCase().includes(kw))
-) {
-  transactionTotal += item[3];
-}
+    currentSearchType === 'tempat' ||
+    !kw ||
+    (item[0] && item[0].toLowerCase().includes(kw))
+  ) {
+    transactionTotal += item[3];
+  }
 });
 
 operasional.forEach(item => {
   if (
-  currentSearchType === 'tempat' ||
-  !kw ||
-  (item[0] && item[0].toLowerCase().includes(kw))
-) {
-  transactionTotal += item[3];
-}
+    currentSearchType === 'tempat' ||
+    !kw ||
+    (item[0] && item[0].toLowerCase().includes(kw))
+  ) {
+    transactionTotal += item[3];
+  }
 });
+
 
 
 
