@@ -1313,7 +1313,7 @@ function highlight(text, keyword) {
   );
 }
 
-   function itemMatchesKeyword(item, keyword) {
+   function itemMatchesKeyword(item, currentSearchKeyword) {
   if (!keyword) return true;
   if (!Array.isArray(item)) return false;
 
@@ -1612,9 +1612,13 @@ periodTransactions.forEach(function(t) {
   });
 
   operasional.forEach(item => {
-    if (!kw || item[0].toLowerCase().includes(kw)) {
-      totalAmount += item[3];
-    }
+    if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  totalAmount += item[3];
+}
+
   });
 });
 
