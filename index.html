@@ -1750,24 +1750,27 @@ const operasional = transaction.operasional
           
           let dailyTotal = 0;
 
-dailyTransactions.forEach(function(t) {
+dailyTransactions.forEach(function (t) {
   const bahan = t.items ? JSON.parse(t.items) : [];
-const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+  const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-const filteredBahan = isSearch
-  ? bahan.filter(i =>
-      typeof i[0] === 'string' &&
-      i[0].toLowerCase().includes(keyword)
-    )
-  : bahan;
+  const filteredBahan = isSearch
+    ? bahan.filter(i =>
+        typeof i[0] === 'string' &&
+        i[0].toLowerCase().includes(keyword)
+      )
+    : bahan;
 
-const filteredOperasional = isSearch
-  ? operasional.filter(o =>
-      typeof o[0] === 'string' &&
-      o[0].toLowerCase().includes(keyword)
-    )
-  : operasional;
-}
+  const filteredOperasional = isSearch
+    ? operasional.filter(o =>
+        typeof o[0] === 'string' &&
+        o[0].toLowerCase().includes(keyword)
+      )
+    : operasional;
+
+  // 👉 lanjutkan render / proses di sini jika ada
+});
+
 
 
 
