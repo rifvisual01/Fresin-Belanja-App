@@ -1487,7 +1487,11 @@ function handleAdminSearch(raw) {
     v.toLowerCase().includes(keyword)
   );
 
-  const results = [...new Set([...tempatMatch, ...barangMatch])].slice(0, 8);
+  const results = [
+  ...tempatMatch.map(v => ({ value: v, type: 'tempat' })),
+  ...barangMatch.map(v => ({ value: v, type: 'item' }))
+].slice(0, 8);
+
 
   if (!results.length) {
     adminSuggestBox.classList.add('hidden');
@@ -1496,32 +1500,25 @@ function handleAdminSearch(raw) {
   }
 
   adminSuggestBox.innerHTML = results.map(v => `
-    <div class="px-4 py-2 text-sm cursor-pointer hover:bg-red-50"
-         onclick="selectAdminSuggestion('${v.replace(/'/g, "\\'")}')">
-      ${v}
-    </div>
-  `).join('');
+  <div class="px-4 py-2 text-sm cursor-pointer hover:bg-red-50"
+       onclick="selectAdminSuggestion('${v.value.replace(/'/g, "\\'")}', '${v.type}')">
+    ${v.value}
+  </div>
+`).join('');
+
 
   adminSuggestBox.classList.remove('hidden');
 }
 
-function selectAdminSuggestion(value) {
-  // isi input
+function selectAdminSuggestion(value, type) {
   adminInput.value = value;
-
-  // simpan keyword
   currentSearchKeyword = value.toLowerCase().trim();
-
-  // 🔥 TANDAI BAHWA INI SEARCH TEMPAT
-  currentSearchType = 'tempat';
-
-  // tutup suggestion
+  currentSearchType = type; // 'item' atau 'tempat'
   adminSuggestBox.classList.add('hidden');
   clearBtn.classList.remove('hidden');
-
-  // filter laporan
   filterTransactions(currentSearchKeyword);
 }
+
 
 
 
@@ -1604,22 +1601,23 @@ periodTransactions.forEach(function(t) {
   const kw = currentSearchKeyword;
 
   bahan.forEach(item => {
-    if (
+   if (
   currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
+  !kw ||
+  (item[0] && item[0].toLowerCase().includes(kw))
 ) {
-  totalAmount += item[3];
+  transactionTotal += item[3];
 }
   });
 
   operasional.forEach(item => {
     if (
   currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
+  !kw ||
+  (item[0] && item[0].toLowerCase().includes(kw))
 ) {
-  totalAmount += item[3];
+  transactionTotal += item[3];
 }
-
   });
 });
 
@@ -1663,19 +1661,19 @@ if (isMultiDay) {
   currentSearchType === 'tempat' ||
   item[0].toLowerCase().includes(kw)
 ) {
-  total += item[3];
+  transactionTotal += item[3]
 }
 
     });
 
     operasional.forEach(item => {
-      if (
+     if (
   currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
+  !kw ||
+  (item[0] && item[0].toLowerCase().includes(kw))
 ) {
-  total += item[3];
+  transactionTotal += item[3];
 }
-
     });
   });
 
@@ -1811,6 +1809,7 @@ if (
 }
 
 
+
           const dateKey = new Date(transaction.created_at).toISOString().split('T')[0];
           if (!groupedByDate[dateKey]) {
             groupedByDate[dateKey] = [];
@@ -1932,21 +1931,21 @@ const kw = currentSearchKeyword;
 bahan.forEach(item => {
   if (
   currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
+  !kw ||
+  (item[0] && item[0].toLowerCase().includes(kw))
 ) {
-  total += item[3];
+  transactionTotal += item[3];
 }
-
 });
 
 operasional.forEach(item => {
-  if (
+ if (
   currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
+  !kw ||
+  (item[0] && item[0].toLowerCase().includes(kw))
 ) {
-  total += item[3];
+  transactionTotal += item[3];
 }
-
 });
 
 
@@ -2055,21 +2054,21 @@ const kw = currentSearchKeyword;
 bahan.forEach(item => {
   if (
   currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
+  !kw ||
+  (item[0] && item[0].toLowerCase().includes(kw))
 ) {
-  total += item[3];
+  transactionTotal += item[3];
 }
-
 });
 
 operasional.forEach(item => {
   if (
   currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
+  !kw ||
+  (item[0] && item[0].toLowerCase().includes(kw))
 ) {
-  total += item[3];
+  transactionTotal += item[3];
 }
-
 });
 
 
