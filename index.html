@@ -1531,14 +1531,28 @@ function filterTransactions(keyword) {
 }
     function renderReport(periodTransactions) {
       let totalAmount = 0;
+     const isSearching = typeof currentSearchKeyword === 'string' && currentSearchKeyword.length > 0;
+
+function itemMatch(name) {
+  if (!isSearching) return true;
+  return name.toLowerCase().includes(currentSearchKeyword);
+}
 
       periodTransactions.forEach(function(t) {
         const bahan = t.items ? JSON.parse(t.items) : [];
 const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-bahan.forEach(item => totalAmount += item[3]);
-operasional.forEach(item => totalAmount += item[3]);
+bahan.forEach(item => {
+  if (itemMatch(item[0])) {
+    totalAmount += item[3];
+  }
+});
 
+operasional.forEach(item => {
+  if (itemMatch(item[0])) {
+    totalAmount += item[3];
+  }
+});
         });
 
       const startObj = new Date(startDate);
@@ -1571,13 +1585,18 @@ operasional.forEach(item => totalAmount += item[3]);
           const bahan = t.items ? JSON.parse(t.items) : [];
 const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-bahan.forEach(function(item) {
-  dailyTotals[dateKey] += item[3];
+bahan.forEach(item => {
+  if (itemMatch(item[0])) {
+    dailyTotals[dateKey] += item[3];
+  }
 });
 
-operasional.forEach(function(item) {
-  dailyTotals[dateKey] += item[3];
+operasional.forEach(item => {
+  if (itemMatch(item[0])) {
+    dailyTotals[dateKey] += item[3];
+  }
 });
+
 
         });
 
