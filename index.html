@@ -1532,9 +1532,45 @@ function filterTransactions(keyword) {
     function renderReport(periodTransactions) {
       let totalAmount = 0;
 
-      periodTransactions.forEach(function(t) {
-        const bahan = t.items ? JSON.parse(t.items) : [];
-const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+      periodTransactions.forEach(function (t) {
+  const bahan = t.items ? JSON.parse(t.items) : [];
+  const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+
+  const tempat =
+    typeof t.tempat_belanja === 'string'
+      ? t.tempat_belanja.toLowerCase()
+      : '';
+
+  const isTempatSearch =
+    keyword && tempat.includes(keyword);
+
+  // 🔥 JIKA SEARCH TEMPAT → JANGAN DIUBAH (BIARKAN TOTAL LAMA)
+  if (isTempatSearch || !keyword) {
+    bahan.forEach(item => totalAmount += item[3]);
+    operasional.forEach(item => totalAmount += item[3]);
+    return;
+  }
+
+  // 🔥 JIKA SEARCH BAHAN / OPERASIONAL → HITUNG YANG MATCH SAJA
+  bahan.forEach(item => {
+    if (
+      typeof item[0] === 'string' &&
+      item[0].toLowerCase().includes(keyword)
+    ) {
+      totalAmount += item[3];
+    }
+  });
+
+  operasional.forEach(item => {
+    if (
+      typeof item[0] === 'string' &&
+      item[0].toLowerCase().includes(keyword)
+    ) {
+      totalAmount += item[3];
+    }
+  });
+});
+
 
 bahan.forEach(item => totalAmount += item[3]);
 operasional.forEach(item => totalAmount += item[3]);
