@@ -1594,41 +1594,18 @@ function itemMatch(name) {
 }
 
       periodTransactions.forEach(function(t) {
-  const bahan = t.items ? JSON.parse(t.items) : [];
-  const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+        const bahan = t.items ? JSON.parse(t.items) : [];
+const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-  bahan.forEach(item => {
-    totalBahan += item[3];
-    countBahan++;
-  });
-
-       // TAMBAHAN KHUSUS OPERASIONAL (AMAN)
-const items = t.items ? JSON.parse(t.items) : [];
-
-items.forEach(item => {
-  const kategori = (item[1] || '').toLowerCase();
-  const nilai = Number(item[3]) || 0;
-
-  if (kategori.includes('operasional')) {
-    totalOperasional += nilai;
-    countOperasional++;
-  }
+       bahan.forEach(item => {
+  totalBahan += item[3];
+  countBahan++;
 });
 
-  operasional.forEach(item => {
-    const nilai =
-      typeof item[3] === 'number'
-        ? item[3]
-        : typeof item.jumlah === 'number'
-          ? item.jumlah
-          : 0;
-
-    totalOperasional += nilai;
-    if (nilai > 0) countOperasional++;
-  });
-
-       
-
+       operasional.forEach(item => {
+  totalOperasional += item[3];
+  countOperasional++;
+});
 
 if (isPlaceMatch(t)) {
   // 🔵 MODE TEMPAT → hitung SEMUA
@@ -2364,7 +2341,7 @@ ctx.drawImage(
 );
 
 
-  const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+  const base64Data = canvas.toDataURL('image/jpeg', 0.9);
 
   stopCamera(); // 🔒 matikan kamera
 
