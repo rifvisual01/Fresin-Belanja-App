@@ -2402,7 +2402,9 @@ function selectAdminSuggestion(value) {
 
   filterTransactions(value);
 
-  const count = document.querySelectorAll('#transactionsList > div').length;
+  const count = Number(
+  document.getElementById('periodTotalTransactions')?.textContent || 0
+);
   if (count === 0) {
     showToast(`Tidak ada transaksi untuk "${value}"`, 'warning');
   } else {
