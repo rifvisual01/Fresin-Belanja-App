@@ -743,7 +743,8 @@ window.addEventListener('popstate', function (event) {
       if (result.success) {
         hidePinPopup();
         navigate('admin');
-   
+   showToast('Akses admin berhasil!', 'success');
+
       } else {
         document.getElementById('pinError').classList.remove('hidden');
         document.getElementById('pinInput').value = '';
