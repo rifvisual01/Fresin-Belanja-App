@@ -437,7 +437,7 @@
        <div>
         <div class="flex items-center gap-2 mb-2">
          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-         </svg><span id="periodLabel" class="text-sm opacity-90">Periode</span>
+         </svg><span id="periodLabel" class="text-sm opacity-90">Pengeluaran Periode</span>
         </div>
         <p id="periodTotalAmount" class="text-3xl font-bold">Rp 0</p>
        </div>
@@ -1642,19 +1642,24 @@ if (isPlaceMatch(t)) {
       document.getElementById('periodTotalAmount').textContent = 'Rp ' + totalAmount.toLocaleString('id-ID');
       document.getElementById('periodTotalTransactions').textContent = periodTransactions.length;
 
-     // === TAMPILKAN BAHAN BAKU ===
-document.getElementById('bahanTotalAmount').textContent =
-  'Rp ' + totalBahan.toLocaleString('id-ID');
+     // ===== BAHAN BAKU (AMAN) =====
+const bahanAmountEl = document.getElementById('bahanTotalAmount');
+const bahanCountEl = document.getElementById('bahanTotalTransactions');
 
-document.getElementById('bahanTotalTransactions').textContent =
-  countBahan;
+if (bahanAmountEl && bahanCountEl) {
+  bahanAmountEl.textContent = 'Rp ' + totalBahan.toLocaleString('id-ID');
+  bahanCountEl.textContent = countBahan;
+}
 
-// === TAMPILKAN OPERASIONAL ===
-document.getElementById('operasionalTotalAmount').textContent =
-  'Rp ' + totalOperasional.toLocaleString('id-ID');
+// ===== OPERASIONAL (AMAN) =====
+const operasionalAmountEl = document.getElementById('operasionalTotalAmount');
+const operasionalCountEl = document.getElementById('operasionalTotalTransactions');
 
-document.getElementById('operasionalTotalTransactions').textContent =
-  countOperasional;
+if (operasionalAmountEl && operasionalCountEl) {
+  operasionalAmountEl.textContent =
+    'Rp ' + totalOperasional.toLocaleString('id-ID');
+  operasionalCountEl.textContent = countOperasional;
+}
 
       if (currentSearchKeyword) {
   document.getElementById('periodLabel').textContent = periodLabel + ' (Hasil pencarian: "' + currentSearchKeyword + '")';
