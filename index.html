@@ -1598,14 +1598,19 @@ function itemMatch(name) {
 const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
        bahan.forEach(item => {
-  totalBahan += item[3];
-  countBahan++;
+  if (!currentSearchKeyword || itemMatch(item[0])) {
+    totalBahan += item[3];
+    countBahan++;
+  }
 });
 
-       operasional.forEach(item => {
-  totalOperasional += item[3];
-  countOperasional++;
+operasional.forEach(item => {
+  if (!currentSearchKeyword || itemMatch(item[0])) {
+    totalOperasional += item[3];
+    countOperasional++;
+  }
 });
+
 
 if (isPlaceMatch(t)) {
   // 🔵 MODE TEMPAT → hitung SEMUA
