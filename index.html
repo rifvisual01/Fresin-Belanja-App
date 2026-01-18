@@ -1594,15 +1594,17 @@ function itemMatch(name) {
 }
 
       periodTransactions.forEach(function(t) {
-        // BAHAN (TETAP)
-const bahan = t.items ? JSON.parse(t.items) : [];
-bahan.forEach(item => {
-  totalBahan += item[3];
-  countBahan++;
-});
+  const bahan = t.items ? JSON.parse(t.items) : [];
+  const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-// OPERASIONAL (DIAMBIL DARI ITEMS)
+  bahan.forEach(item => {
+    totalBahan += item[3];
+    countBahan++;
+  });
+
+       // TAMBAHAN KHUSUS OPERASIONAL (AMAN)
 const items = t.items ? JSON.parse(t.items) : [];
+
 items.forEach(item => {
   const kategori = (item[1] || '').toLowerCase();
   const nilai = Number(item[3]) || 0;
@@ -1611,6 +1613,19 @@ items.forEach(item => {
     totalOperasional += nilai;
     countOperasional++;
   }
+});
+
+  operasional.forEach(item => {
+    const nilai =
+      typeof item[3] === 'number'
+        ? item[3]
+        : typeof item.jumlah === 'number'
+          ? item.jumlah
+          : 0;
+
+    totalOperasional += nilai;
+    if (nilai > 0) countOperasional++;
+  });
 });
 
        
