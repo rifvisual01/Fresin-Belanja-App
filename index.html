@@ -187,7 +187,23 @@
       <p class="text-gray-600">Masukkan PIN untuk melanjutkan</p>
      </div><input type="password" id="pinInput" class="w-full px-4 py-4 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:border-red-500 focus:outline-none mb-2" placeholder="••••" maxlength="4">
      <p id="pinError" class="hidden text-red-600 text-sm mb-4 text-center">❌ PIN salah! Coba lagi.</p>
-     <div class="grid grid-cols-2 gap-3"><button id="btnCancelPin" class="py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"> Batal </button> <button id="btnSubmitPin" class="py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"> Masuk </button>
+     <div class="grid grid-cols-2 gap-3"><button id="btnCancelPin" class="py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"> Batal </button> <button id="btnSubmitPin"
+  class="py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
+  
+  <span id="btnPinText">Masuk</span>
+
+  <svg id="btnPinSpinner"
+    class="hidden w-5 h-5 animate-spin"
+    fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10"
+      stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor"
+      d="M4 12a8 8 0 018-8V0
+         C5.373 0 0 5.373 0 12h4z"/>
+  </svg>
+
+</button>
+
      </div>
     </div>
    </div><!-- FORM PAGE -->
@@ -564,6 +580,24 @@ clearBtn.addEventListener('click', function () {
   filterTransactions('');
 });
 
+   function setAdminLoading(isLoading) {
+  const btn = document.getElementById('btnSubmitPin');
+  const text = document.getElementById('btnPinText');
+  const spinner = document.getElementById('btnPinSpinner');
+
+  if (isLoading) {
+    btn.disabled = true;
+    btn.classList.add('opacity-80', 'cursor-not-allowed');
+    text.textContent = 'Memverifikasi...';
+    spinner.classList.remove('hidden');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('opacity-80', 'cursor-not-allowed');
+    text.textContent = 'Masuk';
+    spinner.classList.add('hidden');
+  }
+}
+
 function normalizeDriveImage(url) {
   if (!url) return '';
 
@@ -770,6 +804,10 @@ window.addEventListener('popstate', function (event) {
     function verifyPin() {
   const enteredPin = document.getElementById('pinInput').value;
 
+  if (!enteredPin) return;
+
+  setAdminLoading(true); // 🔥 START ANIMASI
+
   const fd = new FormData();
   fd.append('action', 'verifyAdminPin');
   fd.append('pin', enteredPin);
@@ -780,6 +818,8 @@ window.addEventListener('popstate', function (event) {
   })
     .then(res => res.json())
     .then(result => {
+      setAdminLoading(false); // 🔥 STOP ANIMASI
+
       if (result.success) {
         hidePinPopup();
         navigate('admin');
@@ -791,9 +831,11 @@ window.addEventListener('popstate', function (event) {
       }
     })
     .catch(error => {
+      setAdminLoading(false); // 🔥 PASTI BERHENTI
       showToast('Error: ' + error, 'error');
     });
 }
+
 
 
     /**
@@ -1917,7 +1959,7 @@ dayCard.className = `
           ${uniquePlacesCount}
         </p>
         <p class="text-xs opacity-90 leading-none mt-0.5">
-          Tempat
+          User
         </p>
       </div>
 
