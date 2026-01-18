@@ -1603,9 +1603,17 @@ const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 });
 
        operasional.forEach(item => {
-  totalOperasional += item[3];
-  countOperasional++;
+  const nilai =
+    typeof item[3] === 'number'
+      ? item[3]
+      : typeof item.jumlah === 'number'
+        ? item.jumlah
+        : 0;
+
+  totalOperasional += nilai;
+  if (nilai > 0) countOperasional++;
 });
+
 
 if (isPlaceMatch(t)) {
   // 🔵 MODE TEMPAT → hitung SEMUA
