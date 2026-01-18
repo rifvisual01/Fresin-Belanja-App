@@ -499,6 +499,8 @@ let currentPhoto = null;
     let allPeriodTransactions = [];
     let currentSearchKeyword = '';
     let adminSuggestions = { tempat: [], barang: [] };
+   let currentSearchType = 'item'; // 'item' | 'tempat'
+
 
 
 
@@ -513,7 +515,7 @@ adminInput.addEventListener('input', function () {
   const value = this.value;
 
   // 🔥 LANGKAH 3: reset tipe search saat ketik manual
-  currentSearchType = 'all';
+  currentSearchType = 'item';
 
   searchTimer = setTimeout(() => {
     handleAdminSearch(value);
@@ -1563,7 +1565,13 @@ function filterTransactions(keyword) {
       } catch {}
     }
 
-    return tempatMatch || bahanMatch || operasionalMatch;
+   if (currentSearchType === 'tempat') {
+  return tempatMatch;
+}
+
+// default = ITEM
+return bahanMatch || operasionalMatch;
+
   });
 
   renderReport(filtered);
@@ -1595,9 +1603,12 @@ periodTransactions.forEach(function(t) {
   const kw = currentSearchKeyword;
 
   bahan.forEach(item => {
-    if (!kw || item[0].toLowerCase().includes(kw)) {
-      totalAmount += item[3];
-    }
+    if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  totalAmount += item[3];
+}
   });
 
   operasional.forEach(item => {
@@ -1778,15 +1789,13 @@ const filteredOperasional = operasional.filter(item =>
 );
 
 if (
+  currentSearchType === 'item' &&
   currentSearchKeyword &&
-  currentSearchType !== 'tempat' && // 🔥 TAMBAHAN
   filteredBahan.length === 0 &&
   filteredOperasional.length === 0
 ) {
   return;
 }
-
-
 
 
           const dateKey = new Date(transaction.created_at).toISOString().split('T')[0];
@@ -2401,12 +2410,6 @@ function preloadSuggestions() {
     });
 }
 
-
-function selectAdminSuggestion(value) {
-  adminInput.value = value;
-  adminSuggestBox.classList.add('hidden');
-  filterTransactions(value);
-}
 document.addEventListener('click', function (e) {
   if (!adminInput.contains(e.target) && !adminSuggestBox.contains(e.target)) {
     adminSuggestBox.classList.add('hidden');
