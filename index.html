@@ -2325,8 +2325,10 @@ function selectAdminSuggestion(value) {
   filterTransactions(value);
 
   const count = document.querySelectorAll('#transactionsList > div').length;
-  if (count === 0) {
-    showToast(`Tidak ada transaksi untuk "${value}"`, 'warning');
+if (count === 0) {
+  showToast(`Tidak ada transaksi untuk "${value}"`, 'warning');
+} else {
+  showToast(`Ditemukan ${count} transaksi`, 'success');
 }
 document.addEventListener('click', function (e) {
   if (!adminInput.contains(e.target) && !adminSuggestBox.contains(e.target)) {
