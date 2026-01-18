@@ -197,11 +197,11 @@
      <h1 id="pageTitle" class="text-2xl font-bold text-red-900">Catat Pengeluaran</h1>
     </header>
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-     <div class="mb-6"><label for="tempatBelanja" class="block text-sm font-semibold text-gray-700 mb-2">Nama User</label> <div class="relative">
+     <div class="mb-6"><label for="tempatBelanja" class="block text-sm font-semibold text-gray-700 mb-2">Tempat Belanja</label> <div class="relative">
   <input type="text" id="tempatBelanja"
     autocomplete="off"
     class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-500 focus:outline-none transition-colors"
-    placeholder="Contoh: Rifqi / Putra">
+    placeholder="Contoh: Tempat Belanja">
 
   <div id="suggestTempat"
     class="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-56 overflow-y-auto">
@@ -499,9 +499,6 @@ let currentPhoto = null;
     let allPeriodTransactions = [];
     let currentSearchKeyword = '';
     let adminSuggestions = { tempat: [], barang: [] };
-   let currentSearchType = 'item'; // 'item' | 'tempat'
-
-
 
 
 const adminInput = document.getElementById('adminSearchInput');
@@ -514,14 +511,10 @@ adminInput.addEventListener('input', function () {
   clearTimeout(searchTimer);
   const value = this.value;
 
-  // 🔥 LANGKAH 3: reset tipe search saat ketik manual
-  currentSearchType = 'item';
-
   searchTimer = setTimeout(() => {
     handleAdminSearch(value);
   }, 150);
 });
-
 
 
 clearBtn.addEventListener('click', function () {
@@ -1313,15 +1306,6 @@ function highlight(text, keyword) {
   );
 }
 
-   function itemMatchesKeyword(item, keyword) {
-  if (!keyword) return true;
-  if (!Array.isArray(item)) return false;
-
-  const name = String(item[0] || '').toLowerCase();
-  return name.includes(keyword);
-}
-
-
 
     /**
      * ============================================
@@ -1361,16 +1345,13 @@ fetch(API_BASE, {
   allPeriodTransactions = data;
   adminSuggestions = buildAdminSuggestions(data);
 
-  // ❌ JANGAN reset keyword & input
-  // currentSearchKeyword = '';
-  // adminInput.value = '';
-
+  currentSearchKeyword = '';
+  adminInput.value = '';
   adminSuggestBox.classList.add('hidden');
+  clearBtn.classList.add('hidden');
 
-  // ✅ PAKAI FILTER SEARCH YANG SUDAH ADA
-  filterTransactions(currentSearchKeyword);
+  renderReport(data);
 })
-
  .catch(error => {
     showToast('Error loading report: ' + error, 'error');
   })
@@ -1392,47 +1373,16 @@ function buildAdminSuggestions(transactions) {
       tempatSet.add(t.tempat_belanja.trim());
     }
 
-    // bahan baku
-if (t.items) {
-  try {
-    const items = JSON.parse(t.items);
-    items.forEach(i => {
-      if (Array.isArray(i) && typeof i[0] === 'string') {
-        barangSet.add(i[0].trim());
-      }
-    });
-  } catch {}
-}
-
-// operasional
-if (t.operasional) {
-  try {
-    const ops = JSON.parse(t.operasional);
-    ops.forEach(i => {
-      if (Array.isArray(i) && typeof i[0] === 'string') {
-        barangSet.add(i[0].trim());
-      }
-    });
-  } catch {}
-}
-
-
-// operasional ✅ TAMBAHAN
-if (t.operasional) {
-  try {
-    const ops = JSON.parse(t.operasional);
-    ops.forEach(i => {
-      if (Array.isArray(i)) {
-        i.forEach(val => {
-          if (typeof val === 'string' && val.trim()) {
-            barangSet.add(val.trim());
+    if (t.items) {
+      try {
+        const items = JSON.parse(t.items);
+        items.forEach(i => {
+          if (i && typeof i[0] === 'string' && i[0].trim()) {
+            barangSet.add(i[0].trim());
           }
         });
-      }
-    });
-  } catch (e) {}
-}
-
+      } catch (e) {}
+    }
   });
 
   return {
@@ -1466,7 +1416,6 @@ function setLoadReportLoading(isLoading) {
 
 
 function handleAdminSearch(raw) {
-  currentSearchType = 'item'; // 🔥 PAKSA MODE ITEM
   const keyword = raw.trim().toLowerCase();
 
   // KOSONG → tampilkan semua transaksi periode
@@ -1487,11 +1436,7 @@ function handleAdminSearch(raw) {
     v.toLowerCase().includes(keyword)
   );
 
-  const results = [
-  ...tempatMatch.map(v => ({ value: v, type: 'tempat' })),
-  ...barangMatch.map(v => ({ value: v, type: 'item' }))
-].slice(0, 8);
-
+  const results = [...new Set([...tempatMatch, ...barangMatch])].slice(0, 8);
 
   if (!results.length) {
     adminSuggestBox.classList.add('hidden');
@@ -1500,25 +1445,14 @@ function handleAdminSearch(raw) {
   }
 
   adminSuggestBox.innerHTML = results.map(v => `
-  <div class="px-4 py-2 text-sm cursor-pointer hover:bg-red-50"
-       onclick="selectAdminSuggestion('${v.value.replace(/'/g, "\\'")}', '${v.type}')">
-    ${v.value}
-  </div>
-`).join('');
-
+    <div class="px-4 py-2 text-sm cursor-pointer hover:bg-red-50"
+         onclick="selectAdminSuggestion('${v.replace(/'/g, "\\'")}')">
+      ${v}
+    </div>
+  `).join('');
 
   adminSuggestBox.classList.remove('hidden');
 }
-
-function selectAdminSuggestion(value, type) {
-  adminInput.value = value;
-  currentSearchKeyword = value.toLowerCase().trim();
-  currentSearchType = type; // 'item' atau 'tempat'
-  adminSuggestBox.classList.add('hidden');
-  clearBtn.classList.remove('hidden');
-  filterTransactions(currentSearchKeyword);
-}
-
 
 
 
@@ -1526,68 +1460,42 @@ function selectAdminSuggestion(value, type) {
 function filterTransactions(keyword) {
   currentSearchKeyword = (keyword || '').toLowerCase().trim();
 
-  // keyword kosong → tampilkan semua transaksi periode
   if (!currentSearchKeyword) {
     renderReport(allPeriodTransactions);
     return;
   }
 
-  const filtered = allPeriodTransactions.filter(transaction => {
+  const filtered = allPeriodTransactions.filter(function (transaction) {
+    const tempat =
+      typeof transaction.tempat_belanja === 'string'
+        ? transaction.tempat_belanja.toLowerCase()
+        : '';
 
-    // 1️⃣ Cek tempat belanja
-    const tempatMatch =
-      typeof transaction.tempat_belanja === 'string' &&
-      transaction.tempat_belanja
-        .toLowerCase()
-        .includes(currentSearchKeyword);
+    const tempatMatch = tempat.includes(currentSearchKeyword);
 
-    // 2️⃣ Cek bahan baku
-    let bahanMatch = false;
+    let itemMatch = false;
     if (transaction.items) {
       try {
         const items = JSON.parse(transaction.items);
-        bahanMatch = items.some(item =>
-          itemMatchesKeyword(item, currentSearchKeyword)
+        itemMatch = items.some(i =>
+          typeof i[0] === 'string' &&
+          i[0].toLowerCase().includes(currentSearchKeyword)
         );
-      } catch {}
+      } catch (e) {}
     }
 
-    // 3️⃣ Cek operasional
-    let operasionalMatch = false;
-    if (transaction.operasional) {
-      try {
-        const ops = JSON.parse(transaction.operasional);
-        operasionalMatch = ops.some(item =>
-          itemMatchesKeyword(item, currentSearchKeyword)
-        );
-      } catch {}
-    }
-
-   if (currentSearchType === 'tempat') {
-  return tempatMatch;
-}
-
-// default = ITEM
-return bahanMatch || operasionalMatch;
-
+    return tempatMatch || itemMatch;
   });
 
   renderReport(filtered);
 
+  // Tampilkan notifikasi hasil pencarian
   if (filtered.length === 0) {
-  showToast(
-    'Tidak ada hasil untuk "' + currentSearchKeyword + '"',
-    'warning'
-  );
-} else {
-  showToast(
-    'Ditemukan ' + filtered.length + ' transaksi',
-    'success'
-  );
+    showToast('Tidak ada hasil untuk "' + keyword + '"', 'warning');
+  } else {
+    showToast('Ditemukan ' + filtered.length + ' transaksi', 'success');
+  }
 }
-}
-
-
 
   
   
@@ -1595,32 +1503,14 @@ return bahanMatch || operasionalMatch;
     function renderReport(periodTransactions) {
       let totalAmount = 0;
 
-periodTransactions.forEach(t => {
-  const bahan = t.items ? JSON.parse(t.items) : [];
-  const operasional = t.operasional ? JSON.parse(t.operasional) : [];
-  const kw = currentSearchKeyword;
+      periodTransactions.forEach(function(t) {
+        const bahan = t.items ? JSON.parse(t.items) : [];
+const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-  bahan.forEach(item => {
-    if (
-      currentSearchType === 'tempat' ||
-      !kw ||
-      (item[0] && item[0].toLowerCase().includes(kw))
-    ) {
-      totalAmount += item[3];
-    }
-  });
+bahan.forEach(item => totalAmount += item[3]);
+operasional.forEach(item => totalAmount += item[3]);
 
-  operasional.forEach(item => {
-    if (
-      currentSearchType === 'tempat' ||
-      !kw ||
-      (item[0] && item[0].toLowerCase().includes(kw))
-    ) {
-      totalAmount += item[3];
-    }
-  });
-});
-
+        });
 
       const startObj = new Date(startDate);
       const endObj = new Date(endDate);
@@ -1641,61 +1531,41 @@ periodTransactions.forEach(t => {
 }
 
       const chartContainer = document.getElementById('chartContainer');
+      if (isMultiDay) {
+        const dailyTotals = {};
+        
+        periodTransactions.forEach(function(t) {
+          const dateKey = new Date(t.created_at).toISOString().split('T')[0];
+          if (!dailyTotals[dateKey]) {
+            dailyTotals[dateKey] = 0;
+          }
+          const bahan = t.items ? JSON.parse(t.items) : [];
+const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-if (isMultiDay) {
-  const dailyTotals = {}; // ✅ WAJIB ADA
+bahan.forEach(function(item) {
+  dailyTotals[dateKey] += item[3];
+});
 
-  periodTransactions.forEach(function (t) {
-    const dateKey = new Date(t.created_at).toISOString().split('T')[0];
+operasional.forEach(function(item) {
+  dailyTotals[dateKey] += item[3];
+});
 
-    if (!dailyTotals[dateKey]) {
-      dailyTotals[dateKey] = 0;
-    }
+        });
 
-    const bahan = t.items ? JSON.parse(t.items) : [];
-    const operasional = t.operasional ? JSON.parse(t.operasional) : [];
+        const dailyData = Object.keys(dailyTotals).sort().map(function(dateKey) {
+          const dateObj = new Date(dateKey);
+          return {
+            date: dateKey,
+            label: dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+            total: dailyTotals[dateKey]
+          };
+        });
 
-    const kw = currentSearchKeyword;
-
-    bahan.forEach(item => {
-      if (
-  currentSearchType === 'tempat' ||
-  item[0].toLowerCase().includes(kw)
-) {
-  transactionTotal += item[3]
-}
-
-    });
-
-    operasional.forEach(item => {
-     if (
-  currentSearchType === 'tempat' ||
-  !kw ||
-  (item[0] && item[0].toLowerCase().includes(kw))
-) {
-  transactionTotal += item[3];
-}
-    });
-  });
-
-  const dailyData = Object.keys(dailyTotals)
-    .sort()
-    .map(dateKey => ({
-      date: dateKey,
-      label: new Date(dateKey).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short'
-      }),
-      total: dailyTotals[dateKey]
-    }));
-
-  chartContainer.classList.remove('hidden');
-  drawChart(dailyData);
-
-} else {
-  chartContainer.classList.add('hidden');
-}
-
+        chartContainer.classList.remove('hidden');
+        drawChart(dailyData);
+      } else {
+        chartContainer.classList.add('hidden');
+      }
 
       renderTransactions(periodTransactions);
     }
@@ -1782,34 +1652,13 @@ if (isMultiDay) {
         const groupedByDate = {};
         
         transactions.forEach(function(transaction) {
-         const bahan = transaction.items
+          const bahan = transaction.items
   ? JSON.parse(transaction.items)
   : [];
 
 const operasional = transaction.operasional
   ? JSON.parse(transaction.operasional)
   : [];
-
-          const kw = currentSearchKeyword;
-
-const filteredBahan = bahan.filter(item =>
-  !kw || item[0].toLowerCase().includes(kw)
-);
-
-const filteredOperasional = operasional.filter(item =>
-  !kw || item[0].toLowerCase().includes(kw)
-);
-
-if (
-  currentSearchType === 'item' &&
-  currentSearchKeyword &&
-  filteredBahan.length === 0 &&
-  filteredOperasional.length === 0
-) {
-  return;
-}
-
-
 
           const dateKey = new Date(transaction.created_at).toISOString().split('T')[0];
           if (!groupedByDate[dateKey]) {
@@ -1827,19 +1676,18 @@ if (
           
           let dailyTotal = 0;
 
-dailyTransactions.forEach(t => {
+dailyTransactions.forEach(function(t) {
   const bahan = t.items ? JSON.parse(t.items) : [];
   const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
-  bahan.forEach(item => {
+  bahan.forEach(function(item) {
     dailyTotal += item[3];
   });
 
-  operasional.forEach(item => {
+  operasional.forEach(function(item) {
     dailyTotal += item[3];
   });
 });
-
 
 
           // ⭐ HITUNG JUMLAH TEMPAT BELANJA UNIK
@@ -1927,29 +1775,15 @@ const operasional = transaction.operasional
             const timeObj = new Date(transaction.created_at);
             const waktu = timeObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             
-          let transactionTotal = 0;
-const kw = currentSearchKeyword;
+            let transactionTotal = 0;
 
 bahan.forEach(item => {
-  if (
-    currentSearchType === 'tempat' ||
-    !kw ||
-    (item[0] && item[0].toLowerCase().includes(kw))
-  ) {
-    transactionTotal += item[3];
-  }
+  transactionTotal += item[3];
 });
 
 operasional.forEach(item => {
-  if (
-    currentSearchType === 'tempat' ||
-    !kw ||
-    (item[0] && item[0].toLowerCase().includes(kw))
-  ) {
-    transactionTotal += item[3];
-  }
+  transactionTotal += item[3];
 });
-
 
 
             const transactionCard = document.createElement('div');
@@ -2041,40 +1875,12 @@ const operasional = transaction.operasional
   : [];
 
           const dateObj = new Date(transaction.created_at);
-const tanggal = dateObj.toLocaleDateString('id-ID', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric'
-});
-const waktu = dateObj.toLocaleTimeString('id-ID', {
-  hour: '2-digit',
-  minute: '2-digit'
-});
-
-let transactionTotal = 0;
-const kw = currentSearchKeyword;
-
-bahan.forEach(item => {
-  if (
-    currentSearchType === 'tempat' ||
-    !kw ||
-    (item[0] && item[0].toLowerCase().includes(kw))
-  ) {
-    transactionTotal += item[3];
-  }
-});
-
-operasional.forEach(item => {
-  if (
-    currentSearchType === 'tempat' ||
-    !kw ||
-    (item[0] && item[0].toLowerCase().includes(kw))
-  ) {
-    transactionTotal += item[3];
-  }
-});
-
-
+          const tanggal = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+          const waktu = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+          
+          let transactionTotal = 0;
+bahan.forEach(item => transactionTotal += item[3]);
+operasional.forEach(item => transactionTotal += item[3]);
 
 
           const card = document.createElement('div');
@@ -2442,6 +2248,12 @@ function preloadSuggestions() {
     });
 }
 
+
+function selectAdminSuggestion(value) {
+  adminInput.value = value;
+  adminSuggestBox.classList.add('hidden');
+  filterTransactions(value);
+}
 document.addEventListener('click', function (e) {
   if (!adminInput.contains(e.target) && !adminSuggestBox.contains(e.target)) {
     adminSuggestBox.classList.add('hidden');
@@ -2452,26 +2264,3 @@ document.addEventListener('click', function (e) {
   </script>
  </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
