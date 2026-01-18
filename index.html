@@ -1598,6 +1598,14 @@ function itemMatch(name) {
 const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 
        bahan.forEach(item => {
+  // MODE TEMPAT → hitung semua
+  if (isPlaceMatch(t)) {
+    totalBahan += item[3];
+    countBahan++;
+    return;
+  }
+
+  // MODE BARANG / TANPA SEARCH
   if (!currentSearchKeyword || itemMatch(item[0])) {
     totalBahan += item[3];
     countBahan++;
@@ -1605,11 +1613,20 @@ const operasional = t.operasional ? JSON.parse(t.operasional) : [];
 });
 
 operasional.forEach(item => {
+  // MODE TEMPAT → hitung semua
+  if (isPlaceMatch(t)) {
+    totalOperasional += item[3];
+    countOperasional++;
+    return;
+  }
+
+  // MODE BARANG / TANPA SEARCH
   if (!currentSearchKeyword || itemMatch(item[0])) {
     totalOperasional += item[3];
     countOperasional++;
   }
 });
+
 
 
 if (isPlaceMatch(t)) {
