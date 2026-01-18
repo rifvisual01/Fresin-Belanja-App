@@ -1313,14 +1313,14 @@ function highlight(text, keyword) {
   );
 }
 
-   function itemMatchesKeyword(item, currentSearchKeyword) {
+   function itemMatchesKeyword(item, keyword) {
   if (!keyword) return true;
   if (!Array.isArray(item)) return false;
 
-  // hanya cek NAMA BARANG (index 0)
   const name = String(item[0] || '').toLowerCase();
   return name.includes(keyword);
 }
+
 
 
     /**
@@ -1466,6 +1466,7 @@ function setLoadReportLoading(isLoading) {
 
 
 function handleAdminSearch(raw) {
+  currentSearchType = 'item'; // 🔥 PAKSA MODE ITEM
   const keyword = raw.trim().toLowerCase();
 
   // KOSONG → tampilkan semua transaksi periode
@@ -1658,15 +1659,23 @@ if (isMultiDay) {
     const kw = currentSearchKeyword;
 
     bahan.forEach(item => {
-      if (!kw || item[0].toLowerCase().includes(kw)) {
-        dailyTotals[dateKey] += item[3];
-      }
+      if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  total += item[3];
+}
+
     });
 
     operasional.forEach(item => {
-      if (!kw || item[0].toLowerCase().includes(kw)) {
-        dailyTotals[dateKey] += item[3];
-      }
+      if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  total += item[3];
+}
+
     });
   });
 
@@ -1921,15 +1930,23 @@ const operasional = transaction.operasional
 const kw = currentSearchKeyword;
 
 bahan.forEach(item => {
-  if (!kw || item[0].toLowerCase().includes(kw)) {
-    transactionTotal += item[3];
-  }
+  if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  total += item[3];
+}
+
 });
 
 operasional.forEach(item => {
-  if (!kw || item[0].toLowerCase().includes(kw)) {
-    transactionTotal += item[3];
-  }
+  if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  total += item[3];
+}
+
 });
 
 
@@ -2036,15 +2053,23 @@ let transactionTotal = 0;
 const kw = currentSearchKeyword;
 
 bahan.forEach(item => {
-  if (!kw || item[0].toLowerCase().includes(kw)) {
-    transactionTotal += item[3];
-  }
+  if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  total += item[3];
+}
+
 });
 
 operasional.forEach(item => {
-  if (!kw || item[0].toLowerCase().includes(kw)) {
-    transactionTotal += item[3];
-  }
+  if (
+  currentSearchType === 'tempat' ||
+  item[0].toLowerCase().includes(kw)
+) {
+  total += item[3];
+}
+
 });
 
 
